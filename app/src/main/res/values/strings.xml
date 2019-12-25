@@ -1,8 +1,12 @@
 <resources>
     <string name="app_name">Tid for Trening</string>
-    <string name="title_running">Løping</string>
-    <string name="title_lifting">Løfting</string>
-    <string name="title_friends">Venner</string>
-    <string name="activity_start">Start</string>
-    <string name="start_date">Date</string>
+    <string name="title_home">Løfting</string>
+    <string name="title_dashboard">Løping</string>
+    <string name="title_notifications">Skryting</string>
+    <string name="button_start">Start</string>
+    <string name="button_stop">Stopp</string>
+    <string name="button_reset">Nullstill</string>
+    <string name="button_submit">Nettverkskall</string>
+    <string name="timer">Tid</string>
+    <string name="response">Svar</string>
 </resources>
