@@ -1,5 +1,5 @@
 package com.tidfortrening.service
 
-class Service {
+class Service{
 
 }

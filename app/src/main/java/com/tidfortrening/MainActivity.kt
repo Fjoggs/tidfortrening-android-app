@@ -1,5 +1,6 @@
 package com.tidfortrening
 
+import android.location.LocationListener
 import android.os.Bundle
 import android.os.SystemClock
 import android.support.design.widget.BottomNavigationView
@@ -8,17 +9,22 @@ import android.util.Log
 import android.widget.Button
 import android.widget.Chronometer
 import android.widget.TextView
-import com.android.volley.Request.Method.GET
+import com.android.volley.Request.Method.POST
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import kotlinx.android.synthetic.main.activity_main.*
+import org.json.JSONArray
+import org.json.JSONObject
+import java.time.OffsetDateTime
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity()  {
     private lateinit var startButton: Button
     private lateinit var stopButton: Button
     private lateinit var resetButton: Button
     private lateinit var submitButton: Button
+    private lateinit var startDate: OffsetDateTime
+    private lateinit var endDate: OffsetDateTime
 
     private val mOnNavigationItemSelectedListener =
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
@@ -58,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         var stopTime = 0L
 
         val queue = Volley.newRequestQueue(this)
-        val apiUrl = "http://192.168.8.108:8080/activity/read/1"
+        val apiUrl = "http://192.168.8.108:8080"
 
         startButton.setOnClickListener {
             if (resume) {
@@ -66,6 +72,7 @@ class MainActivity : AppCompatActivity() {
                 val timeStopped = SystemClock.elapsedRealtime() - stopTime
                 chronometer.base = chronometer.base + timeStopped
             } else {
+                startDate = OffsetDateTime.now()
                 chronometer.base = SystemClock.elapsedRealtime()
             }
             chronometer.start()
@@ -73,6 +80,7 @@ class MainActivity : AppCompatActivity() {
 
         stopButton.setOnClickListener {
             chronometer.stop()
+            endDate = OffsetDateTime.now()
             stopTime = SystemClock.elapsedRealtime()
             resume = true
         }
@@ -84,19 +92,23 @@ class MainActivity : AppCompatActivity() {
 
         submitButton.setOnClickListener {
             Log.i(TAG, "Trying to submit")
+            val jsonObject = JSONObject()
+            jsonObject.put("startDate", startDate)
+            jsonObject.put("endDate", endDate)
+            jsonObject.put("exercise", 1)
+            jsonObject.put("users", JSONArray(listOf(1)))
+            val activityUrl = "$apiUrl/activity/create"
             val jsonObjectRequest = JsonObjectRequest(
-                GET, apiUrl, null,
+                POST, activityUrl, jsonObject,
                 Response.Listener { response ->
-                    Log.i(TAG,"Here be response $response")
-                    responseView.text = "Response: %s".format(response.toString())
+                    Log.i(TAG, "Response: $response")
                 },
                 Response.ErrorListener { error ->
                     Log.e(TAG, "Error: $error")
-                    responseView.text = "Something went wrong :("
-                }
-            )
-            Log.i(TAG, "Adding to queue")
+                    responseView.text = "Something went wrong :( $error"
+                })
             queue.add(jsonObjectRequest)
+            Log.i(TAG, "Adding to queue")
         }
     }
 
@@ -104,3 +116,10 @@ class MainActivity : AppCompatActivity() {
         private const val TAG = "MainActivity"
     }
 }
+
+//Activity(
+//OffsetDateTime.parse(response["startDate"].toString()),
+//OffsetDateTime.parse(response["endDate"].toString()),
+//Exercise((response["exercise"] as JSONObject).get("name").toString(), (response["exercise"] as JSONObject).get("description").toString()),
+//response["users"] as List<User>
+//)

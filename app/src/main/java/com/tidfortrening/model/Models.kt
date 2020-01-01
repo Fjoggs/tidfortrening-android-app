@@ -1,10 +1,10 @@
 package com.tidfortrening.model
 
-import java.util.*
+import java.time.OffsetDateTime
 
 data class Activity(
-    val startDate: Date,
-    val endDate: Date,
+    val startDate: OffsetDateTime,
+    val endDate: OffsetDateTime,
     val exercise: Exercise,
     val users: List<User>
 )
